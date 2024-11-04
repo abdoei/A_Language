@@ -1,11 +1,13 @@
-func function_name(num b){
-    num a = 5;
+func function_name(int b): int{
+    var a: int = 5;
     return a * b;
 }
 
+
+// main function
 func main(){
-    num a = 5;
-    num b = 6;
-    num c = function_name(b);
+    var a: int = 5;
+    var b: int = 6;
+    var c: int = function_name(b);
     return a + c;
 }

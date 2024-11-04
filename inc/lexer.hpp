@@ -26,6 +26,7 @@ constexpr char OneCharToken[]{
 
 enum class TokenType : char {
   Unknown = -128,
+  _EOF,
 
   // one and more of it mean different tokens
   Slash,
@@ -39,7 +40,8 @@ enum class TokenType : char {
 
   // numbers and identifiers
   Identifier,
-  Number,
+  Int_Number,
+  Float_Number,
 
   // reserved keywords
   Keyword_Function,
@@ -50,6 +52,8 @@ enum class TokenType : char {
   Keyword_While,
   Keyword_Return,
   Keyword_const,
+  Keyword_String,
+  Keyword_Var,
 
   // one character tokens
   EOL = OneCharToken[0],
@@ -72,12 +76,14 @@ const std::unordered_map<std::string_view, TokenType> Keywords = {
     {"func", TokenType::Keyword_Function}, {"num", TokenType::Keyword_Number},
     {"void", TokenType::Keyword_Void},     {"if", TokenType::Keyword_If},
     {"else", TokenType::Keyword_Else},     {"while", TokenType::Keyword_While},
-    {"return", TokenType::Keyword_Return}, {"const", TokenType::Keyword_const}};
+    {"return", TokenType::Keyword_Return}, {"const", TokenType::Keyword_const},
+    {"string", TokenType::Keyword_String}, {"var", TokenType::Keyword_Var},
+    {"int", TokenType::Int_Number},        {"float", TokenType::Float_Number}};
 
 struct SourceLocation {
   std::string_view filepath;
-  int line;
-  int col;
+  unsigned int line;
+  unsigned int col;
 };
 
 struct SourceFile {
@@ -101,19 +107,22 @@ private:
   unsigned int idx = 0;
 
   // funcions
-  char GetNextChar() const { return source_file->buffer[idx]; };
+  char GetNextChar() const { return (idx >= source_file->buffer.size()) ? (char)TokenType::_EOF : source_file->buffer[idx]; };
   char PopNextChar() {
     std::string &buf = source_file->buffer;
     if (idx >= buf.size()) {
-      throw std::runtime_error("Index has passed the source buffer EOF");
+      return (char)TokenType::_EOF;
+      // throw std::runtime_error("Index has passed the source buffer EOF");
     }
     ++column;
     if(buf[idx] == '\n') {
       ++line;
       column = 0;
     }
-    ++idx;
-    return buf[idx];
+    return buf[idx++];
+  }
+  SourceLocation GetSourceLocation() const {
+    return {source_file->path, line, column};
   }
 
 public:
