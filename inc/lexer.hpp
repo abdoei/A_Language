@@ -4,6 +4,9 @@
 #include <string>
 #include <string_view>
 #include <unordered_map>
+#include <filesystem>
+#include <sstream>
+#include <fstream>
 
 namespace  AL
 {
@@ -89,6 +92,30 @@ struct SourceLocation {
 struct SourceFile {
   std::string_view path;
   std::string buffer;
+
+  void fill_the_buffer(){
+    std::filesystem::path _path {path};
+    if (!std::filesystem::exists(path)) {
+      throw std::runtime_error(std::string(path) + std::string(" file not existing.\n"));
+    }
+    std::ifstream source_code{_path};
+    if (!source_code) {
+      throw std::runtime_error(std::string(path) + std::string(" failed to open.\n"));
+    }
+    std::ostringstream _buffer;
+    _buffer << source_code.rdbuf(); 
+    buffer = _buffer.str();
+  }
+
+  SourceFile(std::string_view p, std::string b) :
+    path(p)
+    {
+      if(b == ""){
+        fill_the_buffer();
+      } else {
+        buffer = b;
+      }
+    }
 };
 
 struct Token {

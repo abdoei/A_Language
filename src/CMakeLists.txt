@@ -8,5 +8,10 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 
+set(sources 
+    main.cpp
+    lexer.cpp
+)
+
 # Add the executable
-add_executable(A_Language lexer.cpp main.cpp)
+add_executable(A_Language ${sources})
