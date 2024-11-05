@@ -14,3 +14,15 @@ The lexer outlined in this document is a simple lexer that is capable of tokeniz
 - Operators: `+`, `-`, `*`, `/`, `=`, `==`, `!=`, `<`, `>`, `<=`, `>=`, `&&`, `||`, `!`
 - Delimiters: `(`, `)`, `{`, `}`, `[`, `]`, `,`, `;`
 - Comments: `//`
+
+
+---
+## Known limitations
+- The lexer assumes that the input file is an ascii file.
+- The lexer assumes that the input file is a valid A_Language program. It does not check for syntax errors yet.
+- The lexer does not recognize the following tokens:
+  - `+=`, `-=`, `*=`, `/=`, `++`, `--`
+  - `+=`, `-=`, `*=`, `/=`, `++`, `--`
+  - `<<`, `>>`, `^`, `~`, `->`, `::`
+  - `<<=`, `>>=`, `&=`, `|=`, `^=`
+- The lexer does not support multi-line comments.
