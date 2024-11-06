@@ -76,7 +76,7 @@ Token Lexer::GetNextToken() {
       value += current_char;
     }
 
-    return {std::move(value), token_start_loc, TokenType::Keyword_String};
+    return {std::move(value), token_start_loc, TokenType::String};
   }
 
   // Get a comment start

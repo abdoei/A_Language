@@ -23,6 +23,7 @@ std::string to_string(AL::TokenType tokenT) {
     case TokenType::Identifier: return "Identifier";
     case TokenType::Int_Number: return "Int_Number";
     case TokenType::Float_Number: return "Float_Number";
+    case TokenType::String: return "String";
 
     // Reserved keywords
     case TokenType::Keyword_Function: return "Keyword_Function";
@@ -34,6 +35,8 @@ std::string to_string(AL::TokenType tokenT) {
     case TokenType::Keyword_Return: return "Keyword_Return";
     case TokenType::Keyword_const: return "Keyword_const";
     case TokenType::Keyword_String: return "Keyword_String";
+    case TokenType::Keyword_Float: return "Keyword_Float";
+    case TokenType::Keyword_Int: return "Keyword_Int";
 
     // Single-character tokens
     case TokenType::EOL: return "EOL";

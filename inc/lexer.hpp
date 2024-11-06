@@ -45,6 +45,7 @@ enum class TokenType : char {
   Identifier,
   Int_Number,
   Float_Number,
+  String,
 
   // reserved keywords
   Keyword_Function,
@@ -57,6 +58,8 @@ enum class TokenType : char {
   Keyword_const,
   Keyword_String,
   Keyword_Var,
+  Keyword_Int,
+  Keyword_Float,
 
   // one character tokens
   EOL = OneCharToken[0],
@@ -81,7 +84,7 @@ const std::unordered_map<std::string_view, TokenType> Keywords = {
     {"else", TokenType::Keyword_Else},     {"while", TokenType::Keyword_While},
     {"return", TokenType::Keyword_Return}, {"const", TokenType::Keyword_const},
     {"string", TokenType::Keyword_String}, {"var", TokenType::Keyword_Var},
-    {"int", TokenType::Int_Number},        {"float", TokenType::Float_Number}};
+    {"int", TokenType::Keyword_Int},       {"float", TokenType::Keyword_Float}};
 
 struct SourceLocation {
   std::string_view filepath;
@@ -89,6 +92,7 @@ struct SourceLocation {
   unsigned int col;
 };
 
+/* It will not check the validity of the path if the buffer != "" */
 struct SourceFile {
   std::string_view path;
   std::string buffer;

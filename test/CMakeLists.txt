@@ -1,10 +1,10 @@
-add_executable(test1 lexer_test.cpp)
+add_executable(lexer_test lexer_test.cpp)
 
-target_link_libraries(test1 gtest gtest_main)
+target_link_libraries(lexer_test gtest gtest_main)
 
-add_test(NAME test1 COMMAND test1)
+add_test(NAME lexer_test COMMAND lexer_test)
 
 unset(TESTING CACHE)
 
 # set the output directory for the test binary
-set_target_properties(test1 PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${MAINFOLDER}/test")
+set_target_properties(lexer_test PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${MAINFOLDER}/test")

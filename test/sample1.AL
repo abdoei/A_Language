@@ -1,3 +1,4 @@
+// function to check if a number divides another number
 func divides(n: int, divisor: int): int {
     var i = 1;
     while (!(i > n)) {
