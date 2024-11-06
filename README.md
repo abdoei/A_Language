@@ -11,7 +11,7 @@ The lexer outlined in this document is a simple lexer that is capable of tokeniz
 - Identifiers
 - Numbers (integers and floats)
 - Strings
-- Operators: `+`, `-`, `*`, `/`, `=`, `==`, `!=`, `<`, `>`, `<=`, `>=`, `&&`, `||`, `!`
+- Operators: `+`, `-`, `*`, `/`, `=`, `==`, `<`, `>`, `&`, `&&`, `|`, `||`, `!`
 - Delimiters: `(`, `)`, `{`, `}`, `[`, `]`, `,`, `;`
 - Comments: `//`
 
