@@ -22,6 +22,7 @@ TEST(LexerTest, sample0AL) {
 
   EXPECT_EQ(t.type, AL::TokenType::Keyword_Function);
 }
+
 // Trivial test1
 TEST(LexerTest, sample1AL) {
   SourceFile src{"sample1.AL", ""};
@@ -33,12 +34,11 @@ TEST(LexerTest, sample1AL) {
 }
 
 TEST(LexerTest, EmptyMain) {
-  const char *code = R"( 
+  std::string content = R"( 
     func main() : void {
       return;
     }
     )";
-  std::string content = std::move(code);
   SourceFile src{"path is not checked", content};
   Lexer lex(src);
 
@@ -63,7 +63,7 @@ TEST(LexerTest, EmptyMain) {
 }
 
 TEST(LexerTest, MathInMain) {
-  const char *code = R"( 
+  std::string content = R"( 
     func main() : void {
       // isPrime
       if (x == 0 || x == 1) {
@@ -81,7 +81,6 @@ TEST(LexerTest, MathInMain) {
       return 1;
     }
   )";
-  std::string content = std::move(code);
   SourceFile src{"path is not checked", content};
   Lexer lex(src);
 
@@ -121,9 +120,8 @@ TEST(LexerTest, MathInMain) {
   EXPECT_EQ(expected, output);
 }
 
-
 TEST(LexerTest, TokenTypesCoverage) {
-  const char *code = R"( 
+  std::string content = R"( 
     func faulty_function(x: int) : void {
       var a: int = 1;
       const var b: float = 0.5 + 10.;
@@ -132,7 +130,6 @@ TEST(LexerTest, TokenTypesCoverage) {
       else {return;}
     }
   )";
-  std::string content = std::move(code);
   SourceFile src{"path is not checked", content};
   Lexer lex(src);
 
