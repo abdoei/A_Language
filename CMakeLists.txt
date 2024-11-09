@@ -23,6 +23,6 @@ add_subdirectory(src)
 # Add the GTest directory
 add_subdirectory(external/gtest)
 
-# Enable testing if requested
+# Enable testing 
 enable_testing()
 add_subdirectory(test)

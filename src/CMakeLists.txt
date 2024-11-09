@@ -14,4 +14,8 @@ set(sources
 )
 
 # Add the executable
-add_executable(A_Language ${sources})
+# add_executable(A_Language ${sources})
+
+add_library(A_Language_lib STATIC 
+            ${sources}
+)

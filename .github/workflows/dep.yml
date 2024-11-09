@@ -31,4 +31,4 @@ jobs:
     - name: Run tests
       run: |
         cd test
-        ./lexer_test
+        ./A_Language_tests

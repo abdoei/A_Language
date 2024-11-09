@@ -1,10 +1,19 @@
-add_executable(lexer_test lexer_test.cpp)
+cmake_minimum_required(VERSION 3.10)
 
-target_link_libraries(lexer_test gtest gtest_main)
+set(test A_Language_tests)
 
-add_test(NAME lexer_test COMMAND lexer_test)
+set(test_sources 
+    lexer_test.cpp
+)
 
-unset(TESTING CACHE)
+add_executable(${test} ${test_sources})
+
+target_link_libraries(${test} PUBLIC 
+                      gtest_main
+                      A_Language_lib
+)
+
+add_test(NAME ${test} COMMAND ${test})
 
 # set the output directory for the test binary
-set_target_properties(lexer_test PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${MAINFOLDER}/test")
+set_target_properties(${test} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${MAINFOLDER}/test")
