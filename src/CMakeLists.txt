@@ -11,6 +11,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(sources 
     main.cpp
     lexer.cpp
+    ast.cpp
+    parser.cpp
 )
 
 # Add the executable

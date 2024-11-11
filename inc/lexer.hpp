@@ -7,6 +7,7 @@
 #include <filesystem>
 #include <sstream>
 #include <fstream>
+#include "utils.hpp"
 
 namespace  AL
 {
@@ -84,12 +85,7 @@ const std::unordered_map<std::string_view, TokenType> Keywords = {
     {"else", TokenType::Keyword_Else},     {"while", TokenType::Keyword_While},
     {"return", TokenType::Keyword_Return}, {"const", TokenType::Keyword_const},
     {"string", TokenType::Keyword_String}, {"var", TokenType::Keyword_Var},
-    {"int", TokenType::Keyword_Int},       {"float", TokenType::Keyword_Float}};
-
-struct SourceLocation {
-  std::string_view filepath;
-  unsigned int line;
-  unsigned int col;
+    {"int", TokenType::Keyword_Int},       {"float", TokenType::Keyword_Float}
 };
 
 /* It will not check the validity of the path if the buffer != "" */

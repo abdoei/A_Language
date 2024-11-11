@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
   
   AL::Token current_token;
   while (AL::TokenType::_EOF != (current_token = L1.GetNextToken()).type){
-    std::cout << to_string(current_token.type) << "\t\t";
+    // std::cout << to_string(current_token.type) << "\t\t";
     if (current_token.value != std::nullopt) {
       std::cout << current_token.value.value() << '\t';
     }

@@ -1,7 +1,30 @@
 #pragma once
-#include <string>
-#include"lexer.hpp"
+#include <cassert>
+#include <iostream>
 
+namespace AL
+{
+// enum class TokenType : char;
+
+struct SourceLocation {
+  std::string_view filepath;
+  unsigned int line;
+  unsigned int col;
+};
+
+inline std::nullptr_t 
+report(SourceLocation loc, std::string_view msg, bool isWarning = false){
+  const auto [file_path, line, col] = loc;
+  assert((!file_path.empty()) && (line != 0) && (col != 0));
+  std::cerr << file_path << ':' << line << ':' << col << ':'
+            << (isWarning ? " warning: " : " error: ") << msg << '\n';
+
+  return nullptr;
+}
+
+}  // namespace AL
+
+ /*
 // Function to convert enum values to their string names
 std::string to_string(AL::TokenType tokenT) {
   using AL::TokenType;
@@ -58,3 +81,4 @@ std::string to_string(AL::TokenType tokenT) {
     default: return "Unknown";
   }
 }
+*/

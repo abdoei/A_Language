@@ -1,4 +1,5 @@
-#include "lexer.cpp"
+#include "lexer.hpp"
+#include "parser.hpp"
 #include <filesystem>
 #include <fstream>
 #include <gtest/gtest.h>
@@ -7,12 +8,14 @@
 #include <vector>
 
 using AL::Lexer;
+using AL::Parser;
 using AL::SourceFile;
 using AL::Token;
 using AL::TokenType;
 using std::string;
 using std::vector;
 
+/* Lexer Tests */
 // Trivial test0
 TEST(LexerTest, sample0AL) {
   SourceFile src{"sample0.AL", ""};
@@ -169,3 +172,18 @@ TEST(LexerTest, TokenTypesCoverage) {
   EXPECT_EQ(expected, output);
 }
 
+/* Parser Tests */
+TEST(Parser, FirstTest) {
+  std::string content = R"( 
+    func main() : void {
+      
+    }
+    )";
+  SourceFile src{"path_not_checked_PFT", content};
+  Lexer lex(src);
+
+  Parser parser = Parser(lex);
+  auto &&[functions, complete] = parser.ParseSourceFile();
+
+  EXPECT_TRUE(complete);
+}
