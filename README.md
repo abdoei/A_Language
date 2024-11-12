@@ -17,6 +17,10 @@ The lexer outlined in this document is a simple lexer that is capable of tokeniz
 
 
 ---
+## Grammar for the language *so far*
+The grammer rules for the A_Language are written in BNF form. The grammar rules are listed in the [`grammar.md`](grammar.md) file.
+
+---
 ## Known limitations
 - The lexer assumes that the input file is an ascii file.
 - The lexer assumes that the input file is a valid A_Language program. It does not check for syntax errors yet.
