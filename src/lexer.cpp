@@ -166,4 +166,18 @@ Token Lexer::GetNextToken() {
   return Token{std::nullopt, token_start_loc, TokenType::Unknown};
 }
 
+std::string_view Lexer::GetLine(size_t line_number) const {
+  assert(line_number > 0);
+
+  int start = line_start_idx[line_number - 1];
+  int end = 0;
+  if (line_number >= line_start_idx.size()) end = *(line_start_idx.end() - 1);
+  else end = line_start_idx[line_number];
+  
+  if (end == start) return {};
+  return std::string_view(
+      source_file->buffer.data() + start + (line_number != 1),
+      end - start - (line_number != 1));
+}
+
 } // namespace AL

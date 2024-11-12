@@ -1,12 +1,11 @@
 #pragma once
-#include <memory>
 #include <optional>
-#include <string>
 #include <string_view>
 #include <unordered_map>
 #include <filesystem>
 #include <sstream>
 #include <fstream>
+#include <cassert>
 #include "utils.hpp"
 
 namespace  AL
@@ -113,7 +112,7 @@ struct SourceFile {
       if(b == ""){
         fill_the_buffer();
       } else {
-        buffer = b;
+        buffer = std::move(b);
       }
     }
 };
@@ -132,6 +131,7 @@ private:
   unsigned int line = 1;
   unsigned int column = 0;
   unsigned int idx = 0;
+  std::vector<size_t> line_start_idx; // guaranteed to have the last element = buf.size()
 
   // funcions
   char GetNextChar() const { return (idx >= source_file->buffer.size()) ? (char)TokenType::_EOF : source_file->buffer[idx]; };
@@ -139,7 +139,6 @@ private:
     std::string &buf = source_file->buffer;
     if (idx >= buf.size()) {
       return (char)TokenType::_EOF;
-      // throw std::runtime_error("Index has passed the source buffer EOF");
     }
     ++column;
     if(buf[idx] == '\n') {
@@ -154,8 +153,18 @@ private:
 
 public:
   Lexer(const SourceFile &source)
-      : source_file(std::make_unique<SourceFile>(source)) {}
+      : source_file(std::make_unique<SourceFile>(source)) 
+  {
+    line_start_idx.push_back(0);
+    for(int i =0; i < source_file->buffer.size(); i++) {
+      if (source_file->buffer[i] == '\n') {
+        line_start_idx.push_back(i);
+      }
+    }
+    line_start_idx.push_back(source_file->buffer.size() - 1);
+  }
   Token GetNextToken();
+  std::string_view GetLine(size_t line_number) const;
 };
 
 } // namespace  AL

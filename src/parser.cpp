@@ -21,7 +21,7 @@ std::optional<Type> Parser::ParseType(){
     return ret_type;
   }
 
-  report(next_token.loc, "Expected type specifier");
+  report(next_token.loc, "Expected type specifier here", lexer->GetLine(next_token.loc.line));
   return std::nullopt;
 }
 
@@ -32,8 +32,10 @@ std::unique_ptr<Block> Parser::ParseBlock(){
   SourceLocation body_location = next_token.loc;
   PopNextToken(); // pop '{'
 
-  if (next_token.type != TokenType::RightBrace)
-    return report(next_token.loc, "expected a '}' at the end of the block body");
+  if (next_token.type != TokenType::RightBrace) {
+    return report(next_token.loc, "expected a '}' at the end of the block body",
+                  lexer->GetLine(next_token.loc.line));
+  }
   PopNextToken(); // pop '}'
 
   return std::make_unique<Block>(body_location);
@@ -48,7 +50,7 @@ std::unique_ptr<FunctionDeclaration> Parser::ParseFunctionDeclaration(){
 
   // check the <identifier>
   if (next_token.type != TokenType::Identifier)
-    return report(next_token.loc, "Expected identifier");
+    return report(next_token.loc, "Expected identifier here", lexer->GetLine(next_token.loc.line));
 
   // check if the <identifier> option has value
   assert((next_token.value != std::nullopt) && "Identifier token without value");
@@ -57,17 +59,17 @@ std::unique_ptr<FunctionDeclaration> Parser::ParseFunctionDeclaration(){
 
   // chech the '('
   if(next_token.type != TokenType::LeftParenthesis)
-    return report(next_token.loc, "Expected a '(' here");
+    return report(next_token.loc, "Expected a '(' here", lexer->GetLine(next_token.loc.line));
   PopNextToken(); // pop the '('
 
   // chech the ')'
   if(next_token.type != TokenType::RightParenthesis)
-    return report(next_token.loc, "Expected a ')' here");
+    return report(next_token.loc, "Expected a ')' here", lexer->GetLine(next_token.loc.line));
   PopNextToken(); // pop the ')'
 
   // check the ':'
   if(next_token.type != TokenType::Colon)
-    return report(next_token.loc, "Expected a ':' here");
+    return report(next_token.loc, "Expected a ':' here", lexer->GetLine(next_token.loc.line));
   PopNextToken(); // pop the ':'
 
   // check for type
@@ -78,7 +80,7 @@ std::unique_ptr<FunctionDeclaration> Parser::ParseFunctionDeclaration(){
 
   // chech the '{'
   if(next_token.type != TokenType::LeftBrace)
-    return report(next_token.loc, "Expected function body here");
+    return report(next_token.loc, "Expected function body here", lexer->GetLine(next_token.loc.line));
 
   // check for body
   std::unique_ptr<Block> body_resolved = (ParseBlock());
@@ -100,7 +102,7 @@ Parser::ParseSourceFile() {
 
   while(next_token.type != TokenType::_EOF){
     if(next_token.type != TokenType::Keyword_Function){
-      report(next_token.loc, "Only functions are allowed on top level");
+      report(next_token.loc, "Only functions are allowed on top level", lexer->GetLine(next_token.loc.line));
       
       SyncOn(TokenType::Keyword_Function);
       continue;

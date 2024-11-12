@@ -4,6 +4,7 @@
 #include <memory>
 #include <string>
 #include <cstddef>
+#include <vector>
 
 namespace AL
 {
@@ -16,11 +17,13 @@ struct SourceLocation {
 };
 
 inline std::nullptr_t 
-report(SourceLocation loc, std::string_view msg, bool isWarning = false){
+report(SourceLocation loc, std::string_view msg, std::string_view line_string, bool isWarning = false){
   const auto [file_path, line, col] = loc;
   assert((!file_path.empty()) && (line != 0) && (col != 0));
   std::cerr << file_path << ':' << line << ':' << col << ':'
-            << (isWarning ? " warning: " : " error: ") << msg << '\n';
+            << (isWarning ? " warning: " : " error: ") << msg << '\n'
+            << "    " << line << "  |  " <<  line_string << '\n'
+            << "    " << std::string((1+line/10), ' ') << "  |  " << std::string(loc.col-1, '~') << '^' << "\n\n";
 
   return nullptr;
 }

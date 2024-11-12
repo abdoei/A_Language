@@ -173,17 +173,80 @@ TEST(LexerTest, TokenTypesCoverage) {
 }
 
 /* Parser Tests */
-TEST(Parser, FirstTest) {
+TEST(ParserTest, EmptyMain) {
   std::string content = R"( 
     func main() : void {
       
     }
     )";
-  SourceFile src{"path_not_checked_PFT", content};
+  SourceFile src{"path_not_checked_PT_EM", content};
   Lexer lex(src);
 
   Parser parser = Parser(lex);
   auto &&[functions, complete] = parser.ParseSourceFile();
 
   EXPECT_TRUE(complete);
+  EXPECT_EQ(functions.size(), 1);
+
+  const std::string &main_name = (*functions.begin())->identifier;
+  EXPECT_EQ(main_name, "main");
+}
+
+TEST(ParserTest, FailingTests1) {
+  std::string content = 
+  R"(
+    func main(): void { 
+  )";
+  const SourceFile src{"path_not_checked_PT_FT1", content};
+  Lexer lex(src);
+
+  Parser parser = Parser(lex);
+  
+  testing::internal::CaptureStderr();
+  auto [functions, complete] = parser.ParseSourceFile();
+  std::string err_output = testing::internal::GetCapturedStderr();
+
+  EXPECT_NE(err_output.find("error: expected a '}' at the end of the block body"), std::string::npos);
+  EXPECT_FALSE(complete);
+  EXPECT_EQ(functions.size(), 0);
+}
+
+TEST(ParserTest, FailingTests2) {
+  std::string content = R"( 
+    func error(): {}
+    )";
+  SourceFile src{"path_not_checked_PT_FT2", content};
+  Lexer lex(src);
+
+  Parser parser = Parser(lex);
+  
+  testing::internal::CaptureStderr();
+  auto [functions, complete] = parser.ParseSourceFile();
+  std::string err_output = testing::internal::GetCapturedStderr();
+
+  EXPECT_NE(err_output.find("error: Expected type specifier"), std::string::npos);
+  EXPECT_FALSE(complete);
+  EXPECT_EQ(functions.size(), 0);
+}
+
+TEST(ParserTest, FailingTests3) {
+  SourceFile src{"sample2.AL", ""};
+  Lexer lex(src);
+
+  Parser parser = Parser(lex);
+
+  testing::internal::CaptureStderr();
+  auto [functions, complete] = parser.ParseSourceFile();
+  std::string err_output = testing::internal::GetCapturedStderr();
+
+  EXPECT_NE(err_output.find("error: Expected identifier here"), std::string::npos);
+  EXPECT_NE(err_output.find("error: Expected a '(' here"), std::string::npos);
+  EXPECT_NE(err_output.find("error: Expected a ':' here"), std::string::npos);
+  auto it = err_output.find("error: Expected type specifier here");
+  EXPECT_NE(it, std::string::npos);
+  EXPECT_NE(err_output.find("error: Expected type specifier here", it+1),
+            std::string::npos);
+  EXPECT_NE(err_output.find("error: Expected function body here"), std::string::npos);
+  EXPECT_FALSE(complete);
+  EXPECT_EQ(functions.size(), 1); // Definition of the last valid function
 }
