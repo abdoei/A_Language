@@ -15,6 +15,21 @@ The lexer outlined in this document is a simple lexer that is capable of tokeniz
 - Delimiters: `(`, `)`, `{`, `}`, `[`, `]`, `,`, `;`
 - Comments: `//`
 
+---
+## Paser  *so far*
+The parser is the second step in the compilation process and it is the second part of the A_Language compiler to be implemented. To this point the parser is capable of parsing the following:
+- Function declarations *no parameters so far*
+- Type declarations: `void`, custom types
+- Block statements *simple so far*
+
+The language has the functions as the main and only building block. The functions can be declared with the following syntax:
+```A_Language
+func main() : void {
+    // code goes here
+}
+```
+### Parser state machines diagram
+![Automata](assets/pics/parser_drawing.png)
 
 ---
 ## Grammar for the language *so far*
