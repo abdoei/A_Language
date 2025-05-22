@@ -16,7 +16,7 @@ The lexer outlined in this document is a simple lexer that is capable of tokeniz
 - Comments: `//`
 
 ---
-## Paser  *so far*
+## Parser  *so far*
 The parser is the second step in the compilation process and it is the second part of the A_Language compiler to be implemented. To this point the parser is capable of parsing the following:
 - Function declarations *no parameters so far*
 - Type declarations: `void`, custom types
@@ -40,7 +40,6 @@ The grammer rules for the A_Language are written in BNF form. The grammar rules 
 - The lexer assumes that the input file is an ascii file.
 - The lexer assumes that the input file is a valid A_Language program. It does not check for syntax errors yet.
 - The lexer does not recognize the following tokens:
-  - `+=`, `-=`, `*=`, `/=`, `++`, `--`
   - `+=`, `-=`, `*=`, `/=`, `++`, `--`
   - `<<`, `>>`, `^`, `~`, `->`, `::`
   - `<<=`, `>>=`, `&=`, `|=`, `^=`

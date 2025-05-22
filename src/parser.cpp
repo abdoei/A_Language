@@ -21,7 +21,7 @@ std::optional<Type> Parser::ParseType(){
     return ret_type;
   }
 
-  report(next_token.loc, "Expected type specifier here", lexer->GetLine(next_token.loc.line));
+  ReportError(next_token, "Expected type specifier (e.g., 'void' or identifier).");
   return std::nullopt;
 }
 
@@ -33,8 +33,10 @@ std::unique_ptr<Block> Parser::ParseBlock(){
   PopNextToken(); // pop '{'
 
   if (next_token.type != TokenType::RightBrace) {
-    return report(next_token.loc, "expected a '}' at the end of the block body",
-                  lexer->GetLine(next_token.loc.line));
+    ReportError(next_token, "Expected '}' at the end of the block body.");
+    // Attempt to sync to the next potential function or EOF to allow further parsing.
+    // SyncOn(TokenType::Keyword_Function); // Or a more suitable token for recovery here
+    return nullptr; // Indicate parsing failure for this block
   }
   PopNextToken(); // pop '}'
 
@@ -49,39 +51,48 @@ std::unique_ptr<FunctionDeclaration> Parser::ParseFunctionDeclaration(){
   PopNextToken(); // pop the func keyword
 
   // check the <identifier>
-  if (next_token.type != TokenType::Identifier)
-    return report(next_token.loc, "Expected identifier here", lexer->GetLine(next_token.loc.line));
-
+  if (next_token.type != TokenType::Identifier) {
+    ReportError(next_token, "Expected function name (identifier).");
+    return nullptr;
+  }
   // check if the <identifier> option has value
   assert((next_token.value != std::nullopt) && "Identifier token without value");
   std::string function_identifier = next_token.value.value();
   PopNextToken(); // pop <identifier>
 
   // chech the '('
-  if(next_token.type != TokenType::LeftParenthesis)
-    return report(next_token.loc, "Expected a '(' here", lexer->GetLine(next_token.loc.line));
+  if(next_token.type != TokenType::LeftParenthesis) {
+    ReportError(next_token, "Expected '(' after function name.");
+    return nullptr;
+  }
   PopNextToken(); // pop the '('
 
   // chech the ')'
-  if(next_token.type != TokenType::RightParenthesis)
-    return report(next_token.loc, "Expected a ')' here", lexer->GetLine(next_token.loc.line));
+  if(next_token.type != TokenType::RightParenthesis) {
+    ReportError(next_token, "Expected ')' after function parameters.");
+    return nullptr;
+  }
   PopNextToken(); // pop the ')'
 
   // check the ':'
-  if(next_token.type != TokenType::Colon)
-    return report(next_token.loc, "Expected a ':' here", lexer->GetLine(next_token.loc.line));
+  if(next_token.type != TokenType::Colon) {
+    ReportError(next_token, "Expected ':' before function return type.");
+    return nullptr;
+  }
   PopNextToken(); // pop the ':'
 
   // check for type
   std::optional<Type> type_resolved = ParseType();
   if (type_resolved == std::nullopt) {
+    // ParseType already called ReportError
     return nullptr;
   }
 
   // chech the '{'
-  if(next_token.type != TokenType::LeftBrace)
-    return report(next_token.loc, "Expected function body here", lexer->GetLine(next_token.loc.line));
-
+  if(next_token.type != TokenType::LeftBrace) {
+    ReportError(next_token, "Expected '{' to start function body.");
+    return nullptr;
+  }
   // check for body
   std::unique_ptr<Block> body_resolved = (ParseBlock());
   if (body_resolved == nullptr) {
@@ -102,22 +113,24 @@ Parser::ParseSourceFile() {
 
   while(next_token.type != TokenType::_EOF){
     if(next_token.type != TokenType::Keyword_Function){
-      report(next_token.loc, "Only functions are allowed on top level", lexer->GetLine(next_token.loc.line));
-      
-      SyncOn(TokenType::Keyword_Function);
+      ReportError(next_token, "Expected 'func' keyword for function declaration at top level.");
+      SyncOn(TokenType::Keyword_Function); // Try to find next function
+      if(next_token.type == TokenType::_EOF) break; // Stop if EOF reached after sync
       continue;
     }
 
     std::unique_ptr<FunctionDeclaration> func = ParseFunctionDeclaration();
     if(func == nullptr) {
-      SyncOn(TokenType::Keyword_Function);
+      // ParseFunctionDeclaration or one of its sub-parsers already called ReportError
+      SyncOn(TokenType::Keyword_Function); // Try to find next function
+      if(next_token.type == TokenType::_EOF) break; // Stop if EOF reached after sync
       continue;
     }
 
     function_declarations.emplace_back(std::move(func));
   }
 
-  return {std::move(function_declarations), !incomplete_AST};
+  return {std::move(function_declarations), incomplete_AST}; // Return incomplete_AST directly
 }
 
 } // namespace AL

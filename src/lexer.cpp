@@ -167,17 +167,56 @@ Token Lexer::GetNextToken() {
 }
 
 std::string_view Lexer::GetLine(size_t line_number) const {
-  assert(line_number > 0);
+  assert(line_number > 0); // Line numbers are 1-based
 
-  int start = line_start_idx[line_number - 1];
-  int end = 0;
-  if (line_number >= line_start_idx.size()) end = *(line_start_idx.end() - 1);
-  else end = line_start_idx[line_number];
+  // line_start_idx contains start indices of lines.
+  // line_start_idx[0] is start of line 1.
+  // line_start_idx[k] is start of line k+1 (0-indexed k).
+  // The last element of line_start_idx is source_file->buffer.size().
+  // Number of actual lines = line_start_idx.size() - 1 (if > 0), or 1 if buffer is empty (line_start_idx = [0]).
+
+  if (line_start_idx.empty()) { // Should not happen if constructor ran
+    return {};
+  }
   
-  if (end == start) return {};
-  return std::string_view(
-      source_file->buffer.data() + start + (line_number != 1),
-      end - start - (line_number != 1));
+  if (line_number == 0 || line_number > (line_start_idx.size() - (line_start_idx.back() == source_file->buffer.size() ? 1:0) ) ) {
+     // If line_start_idx.back() is buffer.size(), then .size()-1 is the number of lines.
+     // Example: {"Hello\nWorld"} -> line_start_idx = [0, 6, 11], size=3. Lines = 2. Max line_number = 2.
+     // line_number > 3-1 -> line_number > 2.
+     // Example: {"Hello"} -> line_start_idx = [0, 5], size=2. Lines = 1. Max line_number = 1.
+     // line_number > 2-1 -> line_number > 1.
+     // Example: {""} -> line_start_idx = [0], size=1. Lines = 1 (empty line). Max line_number = 1.
+     // line_number > 1-0 -> line_number > 1. (This needs to be line_number > (line_start_idx.size() == 1 ? 1 : line_start_idx.size() -1)
+    if (source_file->buffer.empty() && line_number == 1 && line_start_idx.size() == 1 && line_start_idx[0] == 0) {
+        return ""; // Special case: line 1 of an empty file is empty.
+    }
+     // A more robust check for valid line numbers:
+     // A line number is valid if it's >= 1 and <= number of lines.
+     // Number of lines can be considered line_start_idx.size() - 1, unless the buffer is empty (1 line).
+     size_t num_lines = source_file->buffer.empty() ? 1 : line_start_idx.size() - 1;
+     if (line_number == 0 || line_number > num_lines) {
+        return {}; // Invalid line number
+     }
+  }
+
+
+  size_t start_idx = line_start_idx[line_number - 1];
+  // end_idx is the start of the next line, or buffer.size() if it's the last line.
+  size_t end_idx = line_start_idx[line_number]; 
+
+  size_t length = end_idx - start_idx;
+
+  // Trim trailing newline characters (\n or \r\n) from the view
+  if (length > 0) {
+    if (source_file->buffer[start_idx + length - 1] == '\n') {
+      length--;
+      if (length > 0 && source_file->buffer[start_idx + length - 1] == '\r') {
+        length--;
+      }
+    }
+  }
+  
+  return std::string_view(source_file->buffer.data() + start_idx, length);
 }
 
 } // namespace AL
