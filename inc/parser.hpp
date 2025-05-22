@@ -21,8 +21,10 @@ class Parser{
   
   void PopNextToken() { next_token = lexer->GetNextToken(); }
   
+  // Error reporting and recovery
+  void ReportError(const Token& error_token, const std::string& expectation_message);
   void SyncOn(TokenType type) { 
-    incomplete_AST = true;
+    // incomplete_AST is set by ReportError, which should be called before SyncOn
     while(next_token.type != type && next_token.type != TokenType::_EOF)
       PopNextToken();
   }

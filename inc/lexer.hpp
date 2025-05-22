@@ -93,11 +93,11 @@ struct SourceFile {
   std::string buffer;
 
   void fill_the_buffer(){
-    std::filesystem::path _path {path};
-    if (!std::filesystem::exists(path)) {
+    std::filesystem::path fs_path {path}; // Changed variable name for clarity
+    if (!std::filesystem::exists(fs_path)) { // Use fs_path
       throw std::runtime_error(std::string(path) + std::string(" file not existing.\n"));
     }
-    std::ifstream source_code{_path};
+    std::ifstream source_code{fs_path}; // Use fs_path
     if (!source_code) {
       throw std::runtime_error(std::string(path) + std::string(" failed to open.\n"));
     }
@@ -155,16 +155,72 @@ public:
   Lexer(const SourceFile &source)
       : source_file(std::make_unique<SourceFile>(source)) 
   {
-    line_start_idx.push_back(0);
-    for(int i =0; i < source_file->buffer.size(); i++) {
-      if (source_file->buffer[i] == '\n') {
-        line_start_idx.push_back(i);
+    line_start_idx.push_back(0); // Always start with 0 for the first line.
+    if (!source_file->buffer.empty()) {
+      for(size_t i = 0; i < source_file->buffer.size(); ++i) { // Change loop variable type to size_t
+        if (source_file->buffer[i] == '\n') {
+          line_start_idx.push_back(i + 1); // Next line starts after the newline
+        }
       }
+      // Add the end of the buffer as the end of the last line,
+      // but only if the buffer is not empty and the last character wasn't a newline (already handled).
+      if (line_start_idx.back() != source_file->buffer.size() && source_file->buffer.back() != '\n') {
+         line_start_idx.push_back(source_file->buffer.size());
+      }
+      // If the file ends with a newline, the last push_back(i+1) would already be buffer.size()
+      // if the buffer is not empty and the last char is \n, then line_start_idx.back() should be buffer.size().
+      // if line_start_idx.back() is i+1, and i is buffer.size() -1, then line_start_idx.back() is buffer.size().
     }
-    line_start_idx.push_back(source_file->buffer.size() - 1);
   }
   Token GetNextToken();
   std::string_view GetLine(size_t line_number) const;
 };
+
+// Helper function to convert TokenType to string
+inline std::string_view to_string(TokenType type) {
+  switch (type) {
+    case TokenType::Unknown: return "Unknown";
+    case TokenType::_EOF: return "_EOF";
+    case TokenType::Slash: return "Slash";
+    case TokenType::SlashSlash: return "SlashSlash";
+    case TokenType::Equal: return "Equal";
+    case TokenType::EqualEqual: return "EqualEqual";
+    case TokenType::Ampersand: return "Ampersand";
+    case TokenType::AmpersandAmpersand: return "AmpersandAmpersand";
+    case TokenType::Pipe: return "Pipe";
+    case TokenType::PipePipe: return "PipePipe";
+    case TokenType::Identifier: return "Identifier";
+    case TokenType::Int_Number: return "Int_Number";
+    case TokenType::Float_Number: return "Float_Number";
+    case TokenType::String: return "String";
+    case TokenType::Keyword_Function: return "Keyword_Function";
+    case TokenType::Keyword_Number: return "Keyword_Number";
+    case TokenType::Keyword_Void: return "Keyword_Void";
+    case TokenType::Keyword_If: return "Keyword_If";
+    case TokenType::Keyword_Else: return "Keyword_Else";
+    case TokenType::Keyword_While: return "Keyword_While";
+    case TokenType::Keyword_Return: return "Keyword_Return";
+    case TokenType::Keyword_const: return "Keyword_const";
+    case TokenType::Keyword_String: return "Keyword_String";
+    case TokenType::Keyword_Var: return "Keyword_Var";
+    case TokenType::Keyword_Int: return "Keyword_Int";
+    case TokenType::Keyword_Float: return "Keyword_Float";
+    case TokenType::EOL: return "EOL";
+    case TokenType::LeftParenthesis: return "LeftParenthesis";
+    case TokenType::RightParenthesis: return "RightParenthesis";
+    case TokenType::LeftBrace: return "LeftBrace";
+    case TokenType::RightBrace: return "RightBrace";
+    case TokenType::Colon: return "Colon";
+    case TokenType::Semicolon: return "Semicolon";
+    case TokenType::Comma: return "Comma";
+    case TokenType::Plus: return "Plus";
+    case TokenType::Minus: return "Minus";
+    case TokenType::Asterisk: return "Asterisk";
+    case TokenType::LowerThan: return "LowerThan";
+    case TokenType::GreaterThan: return "GreaterThan";
+    case TokenType::Exclamation: return "Exclamation";
+    default: return "InvalidTokenType";
+  }
+}
 
 } // namespace  AL

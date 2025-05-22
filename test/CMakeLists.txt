@@ -4,6 +4,7 @@ set(test A_Language_tests)
 
 set(test_sources 
     lexer_test.cpp
+    parser_test.cpp
 )
 
 add_executable(${test} ${test_sources})
